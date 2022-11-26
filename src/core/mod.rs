@@ -1,8 +1,27 @@
 pub mod types;
 
+use std::fs::read_to_string;
 use std::collections::HashMap;
 
 pub use types::*;
+
+pub fn parse_file(path: &str) -> Table {
+    let file = read_to_string(path).expect(&format!("Failed to read: {}", path));
+    let mut headers: Vec<String> = Vec::new();
+    let mut table: Table = Vec::new();
+
+    for (index, line) in file.lines().enumerate() {
+        if index == 0 {
+            headers = parse_line(line);
+        }
+        else {
+            let row = parse_row(line, &headers);
+            table.push(row);
+        }
+    }
+
+    return table;
+}
 
 
 pub fn parse_row(line: &str, headers: &Vec<String>) -> TableRow {
